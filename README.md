@@ -1,2 +1,3 @@
-# random-img
-Demo for my Medium article on Web Components
+# NASA-APOD
+
+Demo webcomponent for my [Medium article on Web Components]()

@@ -1,0 +1,87 @@
+<template>
+  <style>
+    :host {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 15px;
+      border: 2px dashed grey;
+      width: max-content;
+    }
+
+    img {
+      max-width: 500px;
+      max-height: 500px;
+      object-fit: cover;
+    }
+
+    p {
+      text-align: center;
+      text-transform: uppercase;
+      color: grey;
+    }
+  </style>
+  <img src="" />
+  <p></p>
+</template>
+
+<script>
+
+(function(ownerDocument) {
+	class NasaApod extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({mode: 'open'});
+
+      const {shadowRoot} = this;
+      const template = ownerDocument.querySelector('template');
+      const instance = template.content.cloneNode(true);
+
+      shadowRoot.append(instance);
+    }
+
+    static get observedAttributes() {
+      return ['caption'];
+    }
+
+    get caption() {
+      return this.getAttribute('caption');
+    }
+
+    set caption(val) {
+      return this.setAttribute('caption', val);
+    }
+
+		connectedCallback() {
+      const {shadowRoot} = this;
+
+      const caption = this.getAttribute('caption');
+
+      if (caption) {
+        const paragraph = shadowRoot.querySelector('p');
+        paragraph.innerText = caption;
+      }
+
+			fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY')
+				.then(res => res.json())
+				.then(res => {
+					const image = shadowRoot.querySelector('img');
+					image.src = res.hdurl;
+				})
+				.catch(err => console.error);
+    }
+
+    attributeChangedCallback(name, oldVal, newVal) {
+      if (name === 'caption') {
+        const {shadowRoot} = this;
+        const paragraph = shadowRoot.querySelector('p');
+        paragraph.innerText = newVal;
+      }
+    }
+	}
+
+	customElements.define('nasa-apod', NasaApod);
+
+}(document.currentScript.ownerDocument))
+
+</script>
